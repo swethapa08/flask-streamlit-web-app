@@ -3,17 +3,8 @@ import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
-# --------------------------------------------------
-# Configuration
-# --------------------------------------------------
-
-API_URL = "https://flask-streamlit-web-app-1.onrender.com/"
-
-
-# --------------------------------------------------
-# Page configuration
-# --------------------------------------------------
+# Flask API URL
+API_URL = "https://flask-streamlit-web-app-1.onrender.com/api/students"
 
 st.set_page_config(
     page_title="Student Analytics Dashboard",
@@ -21,18 +12,11 @@ st.set_page_config(
     layout="wide"
 )
 
-
-# --------------------------------------------------
-# Title
-# --------------------------------------------------
-
 st.title("📊 Student Analytics Dashboard")
 
 st.write(
-    "This dashboard gets student data "
-    "from the Flask REST API."
+    "This dashboard gets student data from the Flask REST API."
 )
-
 
 # --------------------------------------------------
 # Get data from Flask API
@@ -40,43 +24,64 @@ st.write(
 
 try:
 
-    response = requests.get(API_URL)
+    response = requests.get(
+        API_URL,
+        timeout=30
+    )
 
+    # Show error if Flask API does not return 200
     if response.status_code != 200:
 
-        st.error("Unable to get data from Flask API.")
+        st.error(
+            f"Flask API returned status code: "
+            f"{response.status_code}"
+        )
+
+        st.code(response.text[:1000])
 
         st.stop()
 
-    data = response.json()
+    # Check whether response is actually JSON
+    try:
 
+        data = response.json()
 
-except requests.exceptions.ConnectionError:
+    except ValueError:
+
+        st.error(
+            "Flask API did not return JSON."
+        )
+
+        st.write("Response received from Flask:")
+
+        st.code(response.text[:1000])
+
+        st.stop()
+
+except requests.exceptions.RequestException as e:
 
     st.error(
-        "Flask server is not running. "
-        "Please start Flask first."
+        "Unable to connect to Flask API."
     )
+
+    st.write(str(e))
 
     st.stop()
 
 
 # --------------------------------------------------
-# Check whether data exists
+# Check data
 # --------------------------------------------------
 
-if len(data) == 0:
+if not data:
 
-    st.warning(
-        "No student data found. "
-        "Please add students through the Flask application."
-    )
+    st.warning("No student data found.")
 
     st.stop()
 
 
 # --------------------------------------------------
-# Convert JSON to Pandas DataFrame
+# Convert JSON to DataFrame
 # --------------------------------------------------
 
 df = pd.DataFrame(data)
@@ -95,7 +100,6 @@ average_attendance = df["attendance"].mean()
 
 col1, col2, col3 = st.columns(3)
 
-
 with col1:
 
     st.metric(
@@ -103,14 +107,12 @@ with col1:
         total_students
     )
 
-
 with col2:
 
     st.metric(
         "Average Marks",
         round(average_marks, 2)
     )
-
 
 with col3:
 
@@ -121,7 +123,7 @@ with col3:
 
 
 # --------------------------------------------------
-# Student data
+# Student Data
 # --------------------------------------------------
 
 st.subheader("Student Data")
@@ -133,41 +135,28 @@ st.dataframe(
 
 
 # --------------------------------------------------
-# Department Analysis
+# Students by Department
 # --------------------------------------------------
 
 st.subheader("Students by Department")
 
+department_count = df["department"].value_counts()
 
-department_count = (
-    df["department"]
-    .value_counts()
-)
-
-
-st.bar_chart(
-    department_count
-)
+st.bar_chart(department_count)
 
 
 # --------------------------------------------------
 # Average Marks by Department
 # --------------------------------------------------
 
-st.subheader(
-    "Average Marks by Department"
-)
-
+st.subheader("Average Marks by Department")
 
 department_marks = (
     df.groupby("department")["marks"]
     .mean()
 )
 
-
-st.bar_chart(
-    department_marks
-)
+st.bar_chart(department_marks)
 
 
 # --------------------------------------------------
@@ -176,28 +165,18 @@ st.bar_chart(
 
 st.subheader("Marks Distribution")
 
-
 fig1, ax1 = plt.subplots()
-
 
 ax1.hist(
     df["marks"],
     bins=5
 )
 
-
-ax1.set_title(
-    "Distribution of Student Marks"
-)
-
+ax1.set_title("Distribution of Student Marks")
 
 ax1.set_xlabel("Marks")
 
-
-ax1.set_ylabel(
-    "Number of Students"
-)
-
+ax1.set_ylabel("Number of Students")
 
 st.pyplot(fig1)
 
@@ -206,34 +185,22 @@ st.pyplot(fig1)
 # Attendance vs Marks
 # --------------------------------------------------
 
-st.subheader(
-    "Attendance vs Marks"
-)
-
+st.subheader("Attendance vs Marks")
 
 fig2, ax2 = plt.subplots()
-
 
 ax2.scatter(
     df["attendance"],
     df["marks"]
 )
 
-
 ax2.set_title(
     "Attendance vs Student Marks"
 )
 
+ax2.set_xlabel("Attendance (%)")
 
-ax2.set_xlabel(
-    "Attendance (%)"
-)
-
-
-ax2.set_ylabel(
-    "Marks"
-)
-
+ax2.set_ylabel("Marks")
 
 st.pyplot(fig2)
 
@@ -242,10 +209,7 @@ st.pyplot(fig2)
 # Statistical Summary
 # --------------------------------------------------
 
-st.subheader(
-    "Statistical Summary"
-)
-
+st.subheader("Statistical Summary")
 
 st.dataframe(
     df.describe(),
