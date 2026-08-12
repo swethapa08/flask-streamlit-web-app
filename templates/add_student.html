@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+
+Add Student
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<div class="row justify-content-center">
+
+
+    <div class="col-md-7">
+
+
+        <div class="card shadow">
+
+
+            <div class="card-header bg-primary text-white">
+
+                <h3>
+                    Add Student
+                </h3>
+
+            </div>
+
+
+            <div class="card-body">
+
+
+                <form
+                    action="{{ url_for('add_student') }}"
+                    method="POST"
+                >
+
+
+                    <!-- Name -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="name"
+                            class="form-label"
+                        >
+                            Student Name
+                        </label>
+
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="name"
+                            name="name"
+                            placeholder="Enter student name"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- Department -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="department"
+                            class="form-label"
+                        >
+                            Department
+                        </label>
+
+
+                        <select
+                            class="form-select"
+                            id="department"
+                            name="department"
+                            required
+                        >
+
+                            <option value="">
+                                Select Department
+                            </option>
+
+                            <option value="CSE">
+                                CSE
+                            </option>
+
+                            <option value="ECE">
+                                ECE
+                            </option>
+
+                            <option value="IT">
+                                IT
+                            </option>
+
+                            <option value="MECH">
+                                MECH
+                            </option>
+
+                            <option value="EEE">
+                                EEE
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- Age -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="age"
+                            class="form-label"
+                        >
+                            Age
+                        </label>
+
+
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="age"
+                            name="age"
+                            min="1"
+                            max="100"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- Marks -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="marks"
+                            class="form-label"
+                        >
+                            Marks
+                        </label>
+
+
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="marks"
+                            name="marks"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- Attendance -->
+
+                    <div class="mb-3">
+
+                        <label
+                            for="attendance"
+                            class="form-label"
+                        >
+                            Attendance %
+                        </label>
+
+
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="attendance"
+                            name="attendance"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Save Student
+                    </button>
+
+
+                    <a
+                        href="{{ url_for('students') }}"
+                        class="btn btn-secondary"
+                    >
+                        Cancel
+                    </a>
+
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}
